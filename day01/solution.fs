@@ -37,11 +37,18 @@ s" ../lib.fs" included
   repeat
   2drop ;
 
-: part1
-  s" input" read-file-into-numbers count-increasers . ;
-: part2
-  s" input" read-file-into-numbers count-sliding-increasers . ;
+: main
+  1 arg read-file-into-numbers
+  2dup
 
-s" Part 1: " type part1 CR
-s" Part 2: " type part2 CR
-bye
+  \ invert throw -> successful conversion, throw -> no characters remaining in string
+  2 arg s>number? invert throw throw
+  
+  1 = if
+    count-increasers
+  else
+    count-sliding-increasers
+  then
+  . CR ;
+
+main bye

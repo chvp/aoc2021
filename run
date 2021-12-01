@@ -1,0 +1,3 @@
+#!/bin/sh
+
+gforth day$1/solution.fs $3 $2
