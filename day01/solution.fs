@@ -41,8 +41,7 @@ s" ../lib.fs" included
   1 arg read-file-into-numbers
   2dup
 
-  \ invert throw -> successful conversion, throw -> no characters remaining in string
-  2 arg s>number? invert throw throw
+  2 arg s>number? invert throw d>s
   
   1 = if
     count-increasers

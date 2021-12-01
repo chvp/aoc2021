@@ -26,7 +26,7 @@
     ( buffer ) dup
     ( buffer ) max-line fd-in read-line throw
   while
-    ( buffer read-length ) dup' s>number? invert throw throw ( buffer number )
+    ( buffer read-length ) dup' s>number? invert throw d>s ( buffer number )
     ( nread buffer number ) rot 1+ rot ( number nread+1 buffer )
   repeat
   ( read-length ) drop
