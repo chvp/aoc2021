@@ -27,10 +27,22 @@
   e a b c d ;
 
 \ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\ \\\ String functions
+\ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+: str-split
+  { s n c -- s1 n1 s2 n2 }
+  c pad c!
+  s n pad 1 search invert throw ( s2' n2' )
+  1 - swap 1 chars + swap ( s2 n2 )
+  s n 2 pick - 1 - 2swap ;
+
+: to-number s>number? invert throw d>s ;
+
+\ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 \ \\\ File reading & parsing
 \ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-32 Constant c-space
 4096 Constant max-line
 : fopen r/o open-file throw ;
 
@@ -46,7 +58,7 @@
     ( buffer ) dup
     ( buffer ) fd-in read-single-line
   while
-    ( buffer read-length ) dup' s>number? invert throw d>s ( buffer number )
+    ( buffer read-length ) dup' to-number ( buffer number )
     ( nread buffer number ) rot 1+ rot ( number nread+1 buffer )
   repeat
   ( read-length ) drop
@@ -65,17 +77,6 @@
   ( s u -- a-addr length )
   fopen read-file-into-numbers' to-array ;
 
-
-\ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-\ \\\ String functions
-\ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-: str-split
-  { s n c -- s1 n1 s2 n2 }
-  c pad c!
-  s n pad 1 search invert throw ( s2' n2' )
-  1 - swap 1 chars + swap ( s2 n2 )
-  s n 2 pick - 1 - 2swap ;
 
 \ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 \ \\\ Control structures

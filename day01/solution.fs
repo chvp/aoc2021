@@ -40,7 +40,7 @@ s" ../lib.fs" included
   2drop ;
 
 : main
-  next-arg s>number? invert throw d>s
+  next-arg to-number
   next-arg read-file-into-numbers
 
   rot 1 = if

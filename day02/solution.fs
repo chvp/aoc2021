@@ -6,8 +6,8 @@ s" ../lib.fs" included
     buffer fd-in read-single-line
   while
     buffer swap ( saddr n )
-    c-space str-split ( saddr1 n saddr2 n )
-    s>number? invert throw d>s ( saddr1 n u )
+    bl str-split ( saddr1 n saddr2 n )
+    to-number ( saddr1 n u )
     -rot ( u saddr1 n )
     xt execute
   repeat
@@ -61,7 +61,7 @@ s" ../lib.fs" included
   3 c-addr n switch ;
 
 : main
-  next-arg s>number? invert throw d>s
+  next-arg to-number
   1 = if
     0 0 ['] part1 looped-part * . CR
   else
