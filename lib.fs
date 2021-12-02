@@ -12,6 +12,8 @@
     a a b ;
 : swap' { a b c -- b a c }
     b a c ;
+: tuck''' { a b c d e -- e a b c d }
+    e a b c d ;
 
 \ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 \ \\\ File reading & parsing
@@ -57,3 +59,37 @@
     s n pad 1 search invert throw ( s2' n2' )
     1 - swap 1 chars + swap ( s2 n2 )
     s n 2 pick - 1 - 2swap ;
+
+\ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\ \\\ Control structures
+\ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+\ All XTs need to have the same stack signature. It is up to the
+\ caller to make sure that the stack beneath the switch arguments
+\ can be used by the XTs.
+: switch ( xt0 s1 u1 xt1 .. sn un xtn n c-addr u -- )
+    2 pick 0 u+do
+        i 1 + 3 * 2 + pick
+        i 1 + 3 * 2 + pick
+        i 1 + 3 * 2 + pick ( c-addr u si ui xti )
+        tuck'''
+        2over
+        str= if
+            ( s1 u1 xt1 .. sn un xtn n xt1 c-addr u )
+            2drop
+            swap
+            3 * 1 + 0 u+do
+                nip
+            loop
+            execute
+            unloop exit
+        else
+            rot
+            drop
+        then
+    loop
+    2drop
+    3 * 0 u+do
+        drop
+    loop
+    execute ;
