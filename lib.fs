@@ -18,6 +18,10 @@
   { a b -- a a b }
   a a b ;
 
+: nip''
+  { a b c d -- b c d }
+  b c d ;
+
 : swap'
   { a b c -- b a c }
   b a c ;
@@ -65,7 +69,7 @@
   fd-in close-file throw
   ( buffer ) free throw ;
 
-: to-array
+: to-numbers-array
   { length -- a-addr length }
   length cells allocate throw
   length 0 do
@@ -73,9 +77,10 @@
     ( number base-addr cur-addr ) swap' !
   loop
   length ;
+
 : read-file-into-numbers
   ( s u -- a-addr length )
-  fopen read-file-into-numbers' to-array ;
+  fopen read-file-into-numbers' to-numbers-array ;
 
 
 \ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
