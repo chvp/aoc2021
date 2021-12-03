@@ -75,10 +75,6 @@ s" ../lib.fs" included
   construct-numbers *
 ;
 
-: store-at
-  { base i n -- }
-  n base i cells + ! ;
-
 : seperate
   { base n u -- base1 n1 base2 n2 }
   n cells allocate throw
@@ -110,21 +106,18 @@ s" ../lib.fs" included
     free throw ( base n u new-base new-n )
     rot 1 - ( base n new-base new-n u' )
     nip''
-    nip''
+    rot' free throw
   repeat
   2drop
   dup @
   swap free throw ;
-  
-
 
 : part2
   { base n u -- n }
-  base n u ['] < seperate-until-1
+  base n copy-array u ['] < seperate-until-1
   base n u ['] >= seperate-until-1
   *
 ;
-
 
 : main
   next-arg to-number

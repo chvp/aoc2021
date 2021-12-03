@@ -18,6 +18,10 @@
   { a b -- a a b }
   a a b ;
 
+: rot'
+  { a b c d -- b c d a }
+  b c d a ;
+
 : nip''
   { a b c d -- b c d }
   b c d ;
@@ -42,6 +46,23 @@
   s n 2 pick - 1 - 2swap ;
 
 : to-number s>number? invert throw d>s ;
+
+\ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\ \\\ Array functions
+\ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+: store-at
+  { base i n -- }
+  n base i cells + ! ;
+
+: copy-array
+  { base n -- base' n }
+  n cells allocate throw
+  n 0 do
+    base i cells + @
+    over i cells + !
+  loop
+  n ;
 
 \ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 \ \\\ File reading & parsing
