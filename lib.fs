@@ -18,6 +18,10 @@
   { a b -- a a b }
   a a b ;
 
+: 2dup'
+  { a b c -- a b a b c }
+  a b a b c ;
+
 : rot'
   { a b c d -- b c d a }
   b c d a ;
@@ -29,6 +33,10 @@
 : swap'
   { a b c -- b a c }
   b a c ;
+
+: 2swap'
+  { a b c d e -- c d a b e }
+  c d a b e ;
 
 : tuck'''
   { a b c d e -- e a b c d }
@@ -44,6 +52,22 @@
   s n pad 1 search invert throw ( s2' n2' )
   1 - swap 1 chars + swap ( s2 n2 )
   s n 2 pick - 1 - 2swap ;
+
+: contains
+  { s n c -- f }
+  c pad c!
+  s n pad 1 search -rot 2drop ;
+
+: trim-front
+  ( s n ) { c -- s' n' }
+  begin
+    swap dup c@ c = while
+    1 chars +
+    swap
+    1 -
+  repeat
+  swap
+;
 
 : to-number s>number? invert throw d>s ;
 
@@ -90,7 +114,7 @@
   fd-in close-file throw
   ( buffer ) free throw ;
 
-: to-numbers-array
+: to-array
   { length -- a-addr length }
   length cells allocate throw
   length 0 do
@@ -101,7 +125,7 @@
 
 : read-file-into-numbers
   ( s u -- a-addr length )
-  fopen read-file-into-numbers' to-numbers-array ;
+  fopen read-file-into-numbers' to-array ;
 
 
 \ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
