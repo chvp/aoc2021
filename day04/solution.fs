@@ -1,11 +1,8 @@
 s" ../lib.fs" included
 
-: read-board
-  { fd -- addr-a }
-  50 cells allocate throw { board }
-  max-line cells allocate throw { buffer }
+: read-board'
+  { board buffer fd }
   5 0 do
-    i { j }
     buffer dup fd read-single-line drop ( buffer length )
     BL trim-front
     4 0 do
@@ -14,16 +11,22 @@ s" ../lib.fs" included
       false board j 5 * i + 2 * 1 + cells + !
       BL trim-front
     loop
-    to-number board j 5 * 4 + 2 * cells + !
-    false board j 5 * 4 + 2 * 1 + cells + !
+    to-number board i 5 * 4 + 2 * cells + !
+    false board i 5 * 4 + 2 * 1 + cells + !
   loop
-  board
+;
+
+: read-board
+  { fd -- addr-a }
+  50 cells allocate throw
+  max-line cells allocate throw
+  dup'
+  fd read-board'
   ;
 
 : board-won
   { addr -- f }
   5 0 do
-    i { j }
     true
     5 0 do
       addr j 5 * i + 2 * 1 + cells + @ and
@@ -55,25 +58,19 @@ s" ../lib.fs" included
 : sum-not-crossed-out
   { addr -- }
   0
-  5 0 do
-    i { j }
-    5 0 do
-      addr j 5 * i + 2 * 1 + cells + @ invert if
-        addr j 5 * i + 2 * cells + @ +
-      then
-    loop
+  25 0 do
+    addr i 2 * 1 + cells + @ invert if
+      addr i 2 * cells + @ +
+    then
   loop
 ;
 
 : cross-out
   { addr u -- }
-  5 0 do
-    i { j }
-    5 0 do
-      addr j 5 * i + 2 * cells + @ u = if
-        true addr j 5 * i + 2 * 1 + cells + !
-      then
-    loop
+  25 0 do
+    addr i 2 * cells + @ u = if
+      true addr i 2 * 1 + cells + !
+    then
   loop
 ;
 
@@ -133,12 +130,8 @@ s" ../lib.fs" included
   part1
 ;
 
-: main
-  next-arg to-number
-  next-arg fopen { fd }
-  max-line cells allocate throw
-  dup fd read-single-line drop
-  1 cells allocate throw { ws-buffer }
+: read-boards
+  { ws-buffer fd }
   0
   begin
     ws-buffer fd read-single-line nip while
@@ -147,6 +140,20 @@ s" ../lib.fs" included
     swap
   repeat
   to-array
+;
+
+: read-input
+  { fd -- n-buf len b-buf len }
+  max-line cells allocate throw
+  dup fd read-single-line drop
+  1 cells allocate throw
+  fd read-boards
+;
+
+: main
+  next-arg to-number
+  next-arg fopen
+  read-input
   ( part n-buf len b-buf len )
   4 pick 1 = if
     part1
