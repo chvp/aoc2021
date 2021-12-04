@@ -20,8 +20,9 @@ s" ../lib.fs" included
   { fd -- addr-a }
   50 cells allocate throw
   max-line cells allocate throw
-  dup'
+  2dup
   fd read-board'
+  free throw
   ;
 
 : board-won
@@ -107,6 +108,8 @@ s" ../lib.fs" included
       2dup cells +
       b-buf i cells + @ swap !
       1 +
+    else
+      b-buf i cells + @ free throw
     then
   loop
   b-buf free throw
@@ -131,7 +134,7 @@ s" ../lib.fs" included
 ;
 
 : read-boards
-  { ws-buffer fd }
+  { ws-buffer fd -- b-buf len }
   0
   begin
     ws-buffer fd read-single-line nip while
@@ -147,7 +150,9 @@ s" ../lib.fs" included
   max-line cells allocate throw
   dup fd read-single-line drop
   1 cells allocate throw
-  fd read-boards
+  dup fd read-boards
+  fd close-file throw
+  rot free throw
 ;
 
 : main
