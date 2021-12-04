@@ -30,6 +30,10 @@
   { a b c d -- b c d }
   b c d ;
 
+: nip'''
+  { a b c d e -- b c d e }
+  b c d e ;
+
 : swap'
   { a b c -- b a c }
   b a c ;

@@ -82,22 +82,28 @@ s" ../lib.fs" included
   loop
 ;
 
+: call-out-number
+  { n-buf nlen b-buf blen -- n n-buf' nlen' b-buf blen }
+  n-buf nlen 2dup
+  [char] , contains if
+    [char] , str-split
+  then
+  2swap to-number
+  b-buf blen 2 pick cross-out-all ( n-buf' nlen' n )
+  -rot b-buf blen ( n n-buf' nlen' b-buf blen )
+;
+
 : part1
-  0 >r
+  0 tuck'''
   begin
     2dup any-board-won invert while
-    r>
-    2drop
-    2swap
-    2dup [char] , contains if
-      [char] , str-split
-    then
-    2swap to-number >r r@ ( b-buf len n-buf len u )
-    2swap' 2dup' ( n-buf len b-buf len b-buf len u )
-    cross-out-all
+    drop
+    nip'''
+    call-out-number
   repeat
   nip cells + @ sum-not-crossed-out
-  r> * . CR
+  -rot 2drop
+  * . CR
 ;
 
 : remove-won-boards
@@ -116,20 +122,12 @@ s" ../lib.fs" included
 ;
 
 : part2
-  0 >r
   begin
     dup 1 > while
-    r> drop
-    2swap
-    2dup [char] , contains if
-      [char] , str-split
-    then
-    2swap to-number >r r@ ( b-buf len n-buf len u )
-    2swap' 2dup' ( n-buf len b-buf len b-buf len u )
-    cross-out-all
+    call-out-number
+    nip'''
     remove-won-boards
   repeat
-  r> drop
   part1
 ;
 
