@@ -39,36 +39,36 @@ s" ../lib.fs" included
 ;
 
 : draw-line'
-  { grid xm x1 y1 x2 y2 xd yd -- }
+  { grid cols x1 y1 x2 y2 xd yd -- }
   x1 y1
   begin
     1 pick x2 = invert 1 pick y2 = invert or while
     2dup
-    xm * + cells grid + 1 swap +!
+    cols * + cells grid + 1 swap +!
     yd + swap xd + swap
   repeat
-  xm * + cells grid + 1 swap +!
+  cols * + cells grid + 1 swap +!
 ;
 
 : draw-line
-  { grid xm x1 y1 x2 y2 -- }
-  grid xm x1 y1 x2 y2
+  { grid cols x1 y1 x2 y2 -- }
+  grid cols x1 y1 x2 y2
   x2 x1 - sgn
   y2 y1 - sgn
   draw-line'
 ;
 
 : draw-line-part1
-  { grid xm x1 y1 x2 y2 -- }
+  { grid cols x1 y1 x2 y2 -- }
   x1 x2 = y1 y2 = or if
-    grid xm x1 y1 x2 y2 draw-line
+    grid cols x1 y1 x2 y2 draw-line
   then
 ;
 
 : fill-grid'
-  { xt grid buf len xm ym -- }
+  { xt grid buf len cols -- }
   len 4 / 0 do
-    grid xm
+    grid cols
     buf i 4 * cells + @
     buf i 4 * 1 + cells + @
     buf i 4 * 2 + cells + @
@@ -79,9 +79,9 @@ s" ../lib.fs" included
 
 : fill-grid
   { buf len xm ym -- buf' len' }
-  xm ym * cells allocate throw dup swap'
-  buf len xm ym fill-grid'
-  xm ym *
+  xm 1 + ym 1 + * cells allocate throw dup swap'
+  buf len xm 1 + fill-grid'
+  xm 1 + ym 1 + *
 ;
 
 : count>2
