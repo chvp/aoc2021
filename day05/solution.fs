@@ -53,24 +53,8 @@ s" ../lib.fs" included
 : draw-line
   { grid xm x1 y1 x2 y2 -- }
   grid xm x1 y1 x2 y2
-  x1 x2 = if
-    0
-  else
-    x1 x2 < if
-      1
-    else
-      -1
-    then
-  then
-  y1 y2 = if
-    0
-  else
-    y1 y2 < if
-      1
-    else
-      -1
-    then
-  then
+  x2 x1 - sgn
+  y2 y1 - sgn
   draw-line'
 ;
 
