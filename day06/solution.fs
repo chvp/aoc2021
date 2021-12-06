@@ -17,25 +17,15 @@ s" ../lib.fs" included
   count-into-age-array'
 ;
 
-: simulate-step'
-  { buf buf' -- buf' }
-  9 0 do
-    0 buf' i cells + !
-  loop
-  buf @ buf' 6 cells + !
+: simulate-step
+  { buf -- }
+  buf @
   9 1 do
     buf i cells + @
-    buf' i 1 - cells + +!
+    buf i 1 - cells + !
   loop
-  buf @ buf' 8 cells + !
-  buf free throw
-  buf'
-;
-
-: simulate-step
-  ( buf -- buf' )
-  9 cells allocate throw
-  simulate-step'
+  dup buf 6 cells + +!
+  buf 8 cells + !
 ;
 
 : sum-buf
@@ -44,12 +34,13 @@ s" ../lib.fs" included
   9 0 do
     buf i cells + @ +
   loop
+  buf free throw
 ;
 
 : main
   next-arg to-number
   1 = if 80 else 256 then
-  max-line cells allocate throw dup
+  max-line cells allocate throw dup dup
   next-arg fopen
   read-single-line drop
   0 -rot
@@ -61,8 +52,9 @@ s" ../lib.fs" included
   repeat
   to-number swap 1 +
   count-into-age-array
+  swap free throw
   swap 0 do
-    simulate-step
+    dup simulate-step
   loop
   sum-buf
   . CR
