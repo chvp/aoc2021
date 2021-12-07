@@ -19,7 +19,7 @@ s" ../lib.fs" included
 : read-board
   { fd -- addr-a }
   50 cells allocate throw
-  max-line cells allocate throw
+  max-line chars allocate throw
   2dup
   fd read-board'
   free throw
@@ -145,7 +145,7 @@ s" ../lib.fs" included
 
 : read-input
   { fd -- n-buf len b-buf len }
-  max-line cells allocate throw
+  max-line chars allocate throw
   dup fd read-single-line drop
   1 cells allocate throw
   dup fd read-boards

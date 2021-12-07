@@ -18,7 +18,7 @@ s" ../lib.fs" included
 : looped-part
   ( xt -- )
   next-arg fopen
-  max-line cells allocate throw
+  max-line chars allocate throw
   looped-part' ;
 
 : part1-forward

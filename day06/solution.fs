@@ -40,7 +40,7 @@ s" ../lib.fs" included
 : main
   next-arg to-number
   1 = if 80 else 256 then
-  max-line cells allocate throw dup dup
+  max-line chars allocate throw dup dup
   next-arg fopen
   read-single-line drop
   comma-line-to-numbers

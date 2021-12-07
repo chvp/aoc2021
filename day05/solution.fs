@@ -103,7 +103,7 @@ s" ../lib.fs" included
     ['] draw-line
   then
   next-arg fopen
-  max-line cells allocate throw
+  max-line chars allocate throw
   read-input
   2dup 2max
   fill-grid

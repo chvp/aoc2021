@@ -127,7 +127,7 @@
 : read-file-into-numbers'
   { fd-in -- ... n }
   0
-  max-line cells allocate throw
+  max-line chars allocate throw
   begin
     ( buffer ) dup
     ( buffer ) fd-in read-single-line

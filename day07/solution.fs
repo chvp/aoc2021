@@ -28,7 +28,7 @@ s" ../lib.fs" included
   else
     ['] part2-dist
   then
-  max-line cells allocate throw dup dup
+  max-line chars allocate throw dup dup
   next-arg fopen
   read-single-line drop
   comma-line-to-numbers
