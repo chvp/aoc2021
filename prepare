@@ -1,3 +1,3 @@
 #!/bin/sh
 
-gforth-fast -e bye
+gforthmi --application run day$1/solution.fs

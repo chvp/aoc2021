@@ -1,4 +1,4 @@
-s" ../lib.fs" included
+needs ../lib.fs
 
 : read-board'
   { board buffer fd }
@@ -153,7 +153,8 @@ s" ../lib.fs" included
   rot free throw
 ;
 
-: main
+:noname
+  next-arg 2drop
   next-arg to-number
   next-arg fopen
   read-input
@@ -164,6 +165,5 @@ s" ../lib.fs" included
     part2
   then
   drop
-;
-
-main bye
+  bye
+; IS 'cold

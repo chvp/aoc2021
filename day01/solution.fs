@@ -1,4 +1,4 @@
-s" ../lib.fs" included
+needs ../lib.fs
 
 : count-increasers
   { base length }
@@ -39,7 +39,8 @@ s" ../lib.fs" included
   repeat
   2drop ;
 
-: main
+:noname
+  next-arg 2drop
   next-arg to-number
   next-arg read-file-into-numbers
 
@@ -48,6 +49,6 @@ s" ../lib.fs" included
   else
     count-sliding-increasers
   then
-  . CR ;
-
-main bye
+  . CR
+  bye
+; IS 'cold

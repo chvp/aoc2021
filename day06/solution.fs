@@ -1,4 +1,4 @@
-s" ../lib.fs" included
+needs ../lib.fs
 
 : count-into-age-array'
   ( ...u ) { n buf -- buf }
@@ -37,7 +37,8 @@ s" ../lib.fs" included
   buf free throw
 ;
 
-: main
+:noname
+  next-arg 2drop
   next-arg to-number
   1 = if 80 else 256 then
   max-line chars allocate throw dup dup
@@ -51,6 +52,5 @@ s" ../lib.fs" included
   loop
   sum-buf
   . CR
-;
-
-main bye
+  bye
+; IS 'cold

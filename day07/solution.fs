@@ -1,4 +1,4 @@
-s" ../lib.fs" included
+needs ../lib.fs
 
 : part1-dist - abs ;
 
@@ -21,7 +21,8 @@ s" ../lib.fs" included
   loop
 ;
 
-: main
+:noname
+  next-arg 2drop
   next-arg to-number
   1 = if
     ['] part1-dist
@@ -37,6 +38,5 @@ s" ../lib.fs" included
   2dup array-max
   min-fuel
   . CR
-;
-
-main bye
+  bye
+; IS 'cold

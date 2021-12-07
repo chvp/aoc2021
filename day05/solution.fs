@@ -1,4 +1,4 @@
-s" ../lib.fs" included
+needs ../lib.fs
 
 : parse-line
   { n line-buf length -- x1 y1 x2 y2 n+4 }
@@ -95,7 +95,8 @@ s" ../lib.fs" included
   buf free throw
 ;
 
-: main
+:noname
+  next-arg 2drop
   next-arg to-number
   1 = if
     ['] draw-line-part1
@@ -109,6 +110,5 @@ s" ../lib.fs" included
   fill-grid
   count>2
   . CR
-;
-
-main bye
+  bye
+; IS 'cold

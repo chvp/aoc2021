@@ -1,4 +1,4 @@
-s" ../lib.fs" included
+needs ../lib.fs
 
 : looped-part'
   { xt fd-in buffer -- }
@@ -60,12 +60,13 @@ s" ../lib.fs" included
   s" down"    ['] part2-down
   3 c-addr n switch ;
 
-: main
+:noname
+  next-arg 2drop
   next-arg to-number
   1 = if
     0 0 ['] part1 looped-part * . CR
   else
     0 0 0 ['] part2 looped-part * . CR drop
-  then ;
-
-main bye
+  then
+  bye
+; IS 'cold

@@ -1,4 +1,4 @@
-s" ../lib.fs" included
+needs ../lib.fs
 
 : bit-at
   { n u -- u }
@@ -119,7 +119,8 @@ s" ../lib.fs" included
   *
 ;
 
-: main
+:noname
+  next-arg 2drop
   next-arg to-number
   next-arg 2 base ! read-file-into-numbers 10 base !
   2dup find-highest-bit-set
@@ -129,6 +130,6 @@ s" ../lib.fs" included
     part2
   then
   . CR
-;
+  bye
+; IS 'cold
 
-main bye

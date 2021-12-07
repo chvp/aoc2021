@@ -1,3 +1,0 @@
-#!/bin/sh
-
-gforth-fast day$1/solution.fs $2 $3
