@@ -103,6 +103,18 @@
   { buffer fd-in -- saddr n eof }
   buffer max-line fd-in read-line throw ;
 
+: comma-line-to-numbers
+  ( s-addr u -- ... n )
+  0 -rot
+  begin
+    2dup [char] , contains while
+    [char] , str-split
+    2swap to-number ( count s n u )
+    -rot 2swap swap 1 + 2swap ( u count+1 s n )
+  repeat
+  to-number swap 1 +
+;
+
 : read-file-into-numbers'
   { fd-in -- ... n }
   0
