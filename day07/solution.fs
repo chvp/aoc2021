@@ -21,15 +21,6 @@ s" ../lib.fs" included
   loop
 ;
 
-: array-max
-  { a-addr n }
-  0
-  n 0 do
-    a-addr i cells + @
-    max
-  loop
-;
-
 : main
   next-arg to-number
   1 = if
