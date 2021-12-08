@@ -1,5 +1,5 @@
 #!/bin/sh
 
-./prepare $1
+./prepare $1 >/dev/null 2>&1
 ./run $1 $2 day$1/input
 ./clean

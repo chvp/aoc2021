@@ -42,6 +42,10 @@
   { a b c d e -- c d a b e }
   c d a b e ;
 
+: 2swap''
+  { a b c d e f -- c d a b e f }
+  c d a b e f ;
+
 : tuck'''
   { a b c d e -- e a b c d }
   e a b c d ;
