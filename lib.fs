@@ -105,6 +105,23 @@
   loop
 ;
 
+\ Basic insertion sort
+: array-sort
+  { addr n }
+  n 0 do
+    i >r
+    begin
+      r@ 0 > addr r@ 1 - cells + @ addr r@ cells + @ > and while
+      addr r@ 1 - cells + @
+      addr r@ cells + @
+      addr r@ 1 - cells + !
+      addr r@ cells + !
+      r> 1 - >r
+    repeat
+    r> drop
+  loop
+;
+
 \ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 \ \\\ File reading & parsing
 \ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
