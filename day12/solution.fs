@@ -25,39 +25,32 @@ needs ../lib.fs
   s-addr n true
 ;
 
-: has-small-dup
-  { depth -- f }
+: check-stack-part2
+  { s-addr n dupe depth -- s-addr n dupe f }
+  s-addr n s" start" str= if
+    s-addr n dupe false exit
+  then
+  s-addr c@ is-upper if
+    s-addr n dupe true exit
+  then
   depth 1 > if
-    depth 1 - 0 do
-      i 3 * 1 + pick c@ is-upper invert if
-        depth i 1 + do
-          j 3 * 1 + pick
-          j 3 * 1 + pick
-          i 3 * 3 + pick
-          i 3 * 3 + pick
-          str= if
-            true unloop unloop exit
-          then
-        loop
+    depth 1 do
+      i 3 * 1 + pick
+      i 3 * 1 + pick
+      s-addr n str= if
+        dupe if
+          unloop s-addr n dupe false exit
+        else
+          unloop s-addr n true true exit
+        then
       then
     loop
   then
-  false
+  s-addr n dupe true
 ;
 
-: check-stack-part2
-  { s-addr n depth -- s-addr n f }
-  s-addr n s" start" str= if
-    s-addr n false exit
-  then
-  depth has-small-dup invert if
-    s-addr n true exit
-  then
-  s-addr n depth check-stack-part1
-;
-
-: count-paths
-  { check-stack nodes n depth -- u }
+: count-paths-part2
+  { dupe nodes n depth -- u }
   2dup s" end" str= if
     1 exit
   then
@@ -69,8 +62,34 @@ needs ../lib.fs
     str= if
       nodes i 4 * 2 + cells + @
       nodes i 4 * 3 + cells + @ ( count s-addr n n-addr n )
-      depth check-stack execute if
-        check-stack nodes n depth 1 + recurse ( count s-addr n n-addr n u )
+      dupe depth check-stack-part2 if
+        nodes n depth 1 + recurse ( count s-addr n n-addr n u )
+        tuck'''
+        >r >r >r >r + r> r> r> r>
+      else
+        drop
+      then
+      2drop
+    then
+  loop
+  rot
+;
+
+: count-paths-part1
+  { nodes n depth -- u }
+  2dup s" end" str= if
+    1 exit
+  then
+  0 -rot ( count s-addr n )
+  n 0 do
+    2dup ( count s-addr n s-addr n )
+    nodes i 4 * cells + @
+    nodes i 4 * 1 + cells + @ ( count s-addr n s-addr n n-addr n )
+    str= if
+      nodes i 4 * 2 + cells + @
+      nodes i 4 * 3 + cells + @ ( count s-addr n n-addr n )
+      depth check-stack-part1 if
+        nodes n depth 1 + recurse ( count s-addr n n-addr n u )
         tuck'''
         >r >r >r >r + r> r> r> r>
       then
@@ -100,13 +119,15 @@ needs ../lib.fs
   s" start"
   next-arg to-number
   1 = if
-    ['] check-stack-part1
+    next-arg fopen
+    read-graph
+    0 count-paths-part1
   else
-    ['] check-stack-part2
+    false
+    next-arg fopen
+    read-graph
+    0 count-paths-part2
   then
-  next-arg fopen
-  read-graph
-  0 count-paths
   . CR
   2drop
   bye
