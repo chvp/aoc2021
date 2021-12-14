@@ -29,14 +29,13 @@ needs ../lib.fs
   0 >r
   max-line chars allocate throw
   begin
-    dup dup fd read-single-line while
-    BL str-split
-    BL str-split 2swap 2drop
+    dup fd read-single-line while
+    dup' 2dup 1 - chars + 1
     2pair-to-3num
     r> 3 + >r
     rot'
   repeat
-  2drop free throw
+  drop free throw
   fd close-file throw
   r> to-array 3 /
 ;
