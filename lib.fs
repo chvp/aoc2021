@@ -105,6 +105,19 @@
   loop
 ;
 
+: array-min>0
+  { a-addr n }
+  -1
+  n 0 do
+    a-addr i cells + @
+    dup 0 > if
+      umin
+    else
+      drop
+    then
+  loop
+;
+
 \ Basic insertion sort
 : array-sort
   { addr n }
