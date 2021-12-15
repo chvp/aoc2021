@@ -22,6 +22,10 @@
   { a b c -- a b a b c }
   a b a b c ;
 
+: 2dup''
+  { a b c d -- a b a b c d }
+  a b a b c d ;
+
 : rot'
   { a b c d -- b c d a }
   b c d a ;
