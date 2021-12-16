@@ -1,6 +1,5 @@
 needs ../lib.fs
 
-: nop ;
 : zero [char] 0 ;
 : one [char] 1 ;
 
@@ -27,22 +26,10 @@ needs ../lib.fs
   0
   n 0 do
     ['] hex0
-    s" 0" ['] hex0
-    s" 1" ['] hex1
-    s" 2" ['] hex2
-    s" 3" ['] hex3
-    s" 4" ['] hex4
-    s" 5" ['] hex5
-    s" 6" ['] hex6
-    s" 7" ['] hex7
-    s" 8" ['] hex8
-    s" 9" ['] hex9
-    s" A" ['] hexA
-    s" B" ['] hexB
-    s" C" ['] hexC
-    s" D" ['] hexD
-    s" E" ['] hexE
-    s" F" ['] hexF
+    s" 0" ['] hex0 s" 1" ['] hex1 s" 2" ['] hex2 s" 3" ['] hex3
+    s" 4" ['] hex4 s" 5" ['] hex5 s" 6" ['] hex6 s" 7" ['] hex7
+    s" 8" ['] hex8 s" 9" ['] hex9 s" A" ['] hexA s" B" ['] hexB
+    s" C" ['] hexC s" D" ['] hexD s" E" ['] hexE s" F" ['] hexF
     16 buf i chars + 1 switch
     5 pick 5 pick 3 + chars + c!
     4 pick 4 pick 2 + chars + c!
@@ -85,7 +72,7 @@ needs ../lib.fs
     ( ... ps p packet )
     swap ( ... ps packet p )
     over ( ... ps packet p packet )
-    3 count + cells + i cells - 1 cells - ! ( ... ps packet )
+    count 2 + i - cells + ! ( ... ps packet )
   loop
   buf
 ;
@@ -113,73 +100,6 @@ defer parse-packet
   version typ count create-operator
 ;
 
-: sum-versions-recursive
-  { packet -- sum }
-  packet @
-  packet cell+ @ 4 = invert if
-    packet 2 cells + @ 0 do
-      packet 3 i + cells + @ recurse +
-    loop
-  then
-  packet free throw
-;
-
-: recursive-packet-value
-  { packet }
-
-  packet cell+ @ 0 = if
-    0
-    packet 2 cells + @ 0 do
-      packet 3 i + cells + @ recurse +
-    loop
-  then
-
-  packet cell+ @ 1 = if
-    1
-    packet 2 cells + @ 0 do
-      packet 3 i + cells + @ recurse *
-    loop
-  then
-
-  packet cell+ @ 2 = if
-    -1
-    packet 2 cells + @ 0 do
-      packet 3 i + cells + @ recurse umin
-    loop
-  then
-
-  packet cell+ @ 3 = if
-    0
-    packet 2 cells + @ 0 do
-      packet 3 i + cells + @ recurse max
-    loop
-  then
-
-  packet cell+ @ 4 = if
-    packet 2 cells + @
-  then
-
-  packet cell+ @ 5 = if
-    packet 3 cells + @ recurse
-    packet 4 cells + @ recurse
-    > if 1 else 0 then
-  then
-
-  packet cell+ @ 6 = if
-    packet 3 cells + @ recurse
-    packet 4 cells + @ recurse
-    < if 1 else 0 then
-  then
-
-  packet cell+ @ 7 = if
-    packet 3 cells + @ recurse
-    packet 4 cells + @ recurse
-    = if 1 else 0 then
-  then
-  
-  packet free throw
-;
-
 :noname
   { buf -- packet buf' }
   buf 3 to-number
@@ -194,6 +114,47 @@ defer parse-packet
     then
   then
 ; IS parse-packet
+
+
+: sum-versions-recursive
+  { packet -- sum }
+  packet @
+  packet cell+ @ 4 = invert if
+    packet 2 cells + @ 0 do
+      packet 3 i + cells + @ recurse +
+    loop
+  then
+  packet free throw
+;
+
+defer recursive-packet-value
+
+: recurse-multop
+  ( n ) { xt packet -- n' }
+  packet 2 cells + @ 0 do
+    packet 3 i + cells + @ recursive-packet-value xt execute
+  loop
+;
+
+: recurse-compare
+  { xt packet -- n }
+  packet 3 cells + @ recursive-packet-value
+  packet 4 cells + @ recursive-packet-value
+  xt execute if 1 else 0 then
+;
+
+:noname
+  { packet -- n }
+  packet cell+ @ 0 = if 0 ['] + packet recurse-multop else
+  packet cell+ @ 1 = if 1 ['] * packet recurse-multop else
+  packet cell+ @ 2 = if -1 ['] umin packet recurse-multop else
+  packet cell+ @ 3 = if 0 ['] max packet recurse-multop else
+  packet cell+ @ 4 = if packet 2 cells + @ else
+  packet cell+ @ 5 = if ['] > packet recurse-compare else
+  packet cell+ @ 6 = if ['] < packet recurse-compare else
+  packet cell+ @ 7 = if ['] = packet recurse-compare then then then then then then then then
+  packet free throw
+; IS recursive-packet-value
 
 :noname
   next-arg 2drop
