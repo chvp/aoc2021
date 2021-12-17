@@ -3,15 +3,13 @@ needs ../lib.fs
 : read-ranges
   { fd buf -- xmin xmax ymin ymax }
   buf buf fd read-single-line invert throw
-  [char] = str-split
-  2swap 2drop
+  swap 15 + swap 15 -
   [char] . str-split
   2swap to-number -rot
   swap 1 + swap 1 -
   [char] , str-split
   2swap to-number -rot
-  [char] = str-split
-  2swap 2drop
+  swap 3 + swap 3 -
   [char] . str-split
   2swap to-number -rot
   swap 1 + swap 1 -
@@ -32,11 +30,7 @@ needs ../lib.fs
 
 : partial-x-sum
   { vel time }
-  time vel > if
-    vel vel partial-y-sum
-  else
-    vel time partial-y-sum
-  then
+  vel vel time min partial-y-sum
 ;
 
 : hits-yrange
@@ -54,7 +48,7 @@ needs ../lib.fs
 
 : hits-xrange
   { vel xmin xmax }
-  1
+  xmin vel /
   begin
     vel over partial-x-sum xmax <= over vel <= and while
     vel over partial-x-sum xmin >= if
@@ -67,16 +61,7 @@ needs ../lib.fs
 
 : find-highest-yvel
   { xmin xmax ymin ymax }
-  1
-  1
-  begin
-    dup ymin negate <= while
-    dup ymin ymax hits-yrange if
-      nip dup
-    then
-    1 +
-  repeat
-  drop
+  ymin 1+ negate
 ;
 
 : find-lowest-xvel
@@ -95,7 +80,10 @@ needs ../lib.fs
 
 : hits-range
   { xvel yvel xmin xmax ymin ymax }
-  yvel 2 * 2 + 1 max xmin xvel / max >r
+  yvel 2 * 2 +
+  xmin xvel /
+  1
+  max max >r
   begin
     xvel r@ partial-x-sum xmax <= yvel r@ partial-y-sum ymin >= and while
     xvel r@ partial-x-sum xmin >= yvel r@ partial-y-sum ymax <= and if
@@ -109,17 +97,16 @@ needs ../lib.fs
     
 : count-velocities
   { xmin xmax ymin ymax }
-  0
   xmin xmax ymin ymax find-highest-yvel 1 +
-  xmin xmax ymin ymax find-lowest-xvel
-  xmax 1 + swap do
-    dup ymin do
+  0
+  xmax 1+ xmin xmax ymin ymax find-lowest-xvel do
+    over ymin do
       j i xmin xmax ymin ymax hits-range if
-        swap 1+ swap
+        1+
       then
     loop
   loop
-  drop
+  nip
 ;
 
 :noname
