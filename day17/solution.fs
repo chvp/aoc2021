@@ -23,10 +23,11 @@ needs ../lib.fs
 : partial-y-sum
   { vel time }
   time time * negate
-  2 time * vel *
   time
-  + +
-  2 /
+  +
+  2/
+  time vel *
+  +
 ;
 
 : partial-x-sum
@@ -40,7 +41,7 @@ needs ../lib.fs
 
 : hits-yrange
   { vel ymin ymax }
-  vel 2 * 1 +
+  vel 2 * 2 +
   begin
     vel over partial-y-sum ymin >= while
     vel over partial-y-sum ymax <= if
@@ -94,7 +95,7 @@ needs ../lib.fs
 
 : hits-range
   { xvel yvel xmin xmax ymin ymax }
-  1 >r
+  yvel 2 * 2 + 1 max xmin xvel / max >r
   begin
     xvel r@ partial-x-sum xmax <= yvel r@ partial-y-sum ymin >= and while
     xvel r@ partial-x-sum xmin >= yvel r@ partial-y-sum ymax <= and if
