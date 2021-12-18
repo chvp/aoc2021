@@ -65,12 +65,12 @@ needs ../lib.fs
   number free throw
 ;
 
-defer read-number
+defer 'read-number
 
 : read-number-or-value
   ( arr buf' ) { set-child set-value -- arr buf' }
   dup c@ [char] [ = if
-    read-number ( arr number buf' )
+    'read-number ( arr number buf' )
     -rot
     2dup set-parent
     over set-child execute
@@ -83,7 +83,7 @@ defer read-number
   then
 ;
 
-:noname
+: read-number
   ( buf -- number buf' )
   1+ \ skip [
   allocate-number
@@ -93,7 +93,8 @@ defer read-number
   1+ \ skip ,
   ['] set-right-child ['] set-right-value read-number-or-value
   1+ \ skip ]
-; IS read-number
+;
+' read-number IS 'read-number
 
 : read-numbers
   { fd buf }
