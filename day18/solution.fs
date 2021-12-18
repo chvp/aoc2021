@@ -54,6 +54,17 @@ needs ../lib.fs
   then
 ;
 
+: free-number
+  { number }
+  number has-left-child if
+    number left-child recurse
+  then
+  number has-right-child if
+    number right-child recurse
+  then
+  number free throw
+;
+
 defer read-number
 
 : read-number-or-value
@@ -273,7 +284,6 @@ defer read-number
   else
     number right-value
   then
-  number free throw
   2 *
   +
 ;
@@ -285,8 +295,8 @@ defer read-number
     arr i cells + @
     add
   loop
+  dup magnitude swap free-number
   arr free throw
-  magnitude
 ;
 
 : find-largest-magnitude
@@ -302,6 +312,10 @@ defer read-number
       then
     loop
   loop
+  len 0 do
+    arr i cells + @ free-number
+  loop
+  arr free throw
 ;
 
 :noname
