@@ -1,56 +1,86 @@
 needs ../lib.fs
 
+\ Numbers are arrays of 3 elements:
+\ 1) Pointer to parent (or 0 if non-existent)
+\ 2) > 0: Pointer to left-child, else: -value
+\ 3) > 0: Pointer to right-child, else: -value
+: allocate-number 3 cells allocate throw ;
+: parent @ ;
+: has-parent @ 0 = invert ;
+: set-parent ! ;
+: left-child cell+ @ ;
+: has-left-child left-child 0 > ;
+: set-left-child cell+ ! ;
+: left-value left-child negate ;
+: set-left-value swap negate swap set-left-child ;
+: right-child 2 cells + @ ;
+: set-right-child 2 cells + ! ;
+: has-right-child right-child 0 > ;
+: right-value right-child negate ;
+: set-right-value swap negate swap set-right-child ;
+
 : type-number
   { number }
   [char] [ emit
-  number cell+ @ 0 = if
-    number 3 cells + @ 1 .r
+  number has-left-child if
+    number left-child recurse
   else
-    number cell+ @ recurse
+    number left-value 1 .r
   then
   [char] , emit
-  number 2 cells + @ 0 = if
-    number 4 cells + @ 1 .r
+  number has-right-child if
+    number right-child recurse
   else
-    number 2 cells + @ recurse
+    number right-value 1 .r
   then
   [char] ] emit
+;
+
+: copy-number
+  { number }
+  allocate-number
+  0 over set-parent
+  number has-left-child if
+    number left-child recurse over set-left-child
+    dup dup left-child set-parent
+  else
+    number left-value over set-left-value
+  then
+  number has-right-child if
+    number right-child recurse over set-right-child
+    dup dup right-child set-parent
+  else
+    number right-value over set-right-value
+  then
 ;
 
 defer read-number
 
 : read-number-or-value
-  ( arr buf' ) { offset -- arr buf' }
+  ( arr buf' ) { set-child set-value -- arr buf' }
   dup c@ [char] [ = if
     read-number ( arr number buf' )
     -rot
-    2dup ! \ Store parent pointer in child
-    over 1 offset + cells + !
+    2dup set-parent
+    over set-child execute
     swap ( arr buf' )
   else
     dup 1 to-number swap 1+ ( arr u buf' )
     -rot
-    over 3 offset + cells + !
-    0 over 1 offset + cells + ! \ Make sure child pointer is 0
+    over set-value execute
     swap ( arr buf' )
   then
 ;
 
-\ Numbers are arrays of 5 elements:
-\ 1) Pointer to parent (or 0 if non-existent)
-\ 2) Pointer to left-child (or 0 if non-existent, 4 should be filled in this case)
-\ 3) Pointer to right-child (or 0 if non-existent, 5 should be filled in this case)
-\ 4) Left value (only valid if there is no left child)
-\ 5) Right value (only valid if there is no right child)
 :noname
   ( buf -- number buf' )
   1+ \ skip [
-  5 cells allocate throw
-  0 over !
+  allocate-number
+  0 over set-parent
   swap
-  0 read-number-or-value
+  ['] set-left-child ['] set-left-value read-number-or-value
   1+ \ skip ,
-  1 read-number-or-value
+  ['] set-right-child ['] set-right-value read-number-or-value
   1+ \ skip ]
 ; IS read-number
 
@@ -71,84 +101,82 @@ defer read-number
 
 : bubble-down-right
   { number val -- }
-  number 2 cells + @ 0 = if
-    val number 4 cells + +!
+  number has-right-child if
+    number right-child val recurse
   else
-    number 2 cells + @ val recurse
+    val number right-value + number set-right-value
   then
 ;
 
 : bubble-up-left
   { number val -- }
-  number @ 0 = if
+  number has-parent invert if
     exit
   then
-  number @ cell+ @ number = if
-    number @ val recurse
+  number parent left-child number = if
+    number parent val recurse
   else
-    number @ cell+ @ 0 = if
-      val number @ 3 cells + +!
+    number parent has-left-child if
+      number parent left-child val bubble-down-right
     else
-      number @ cell+ @ val bubble-down-right
+      val number parent left-value + number parent set-left-value
     then
   then
 ;
 
 : bubble-down-left
   { number val -- }
-  number cell+ @ 0 = if
-    val number 3 cells + +!
+  number has-left-child if
+    number left-child val recurse
   else
-    number cell+ @ val recurse
+    val number left-value + number set-left-value
   then
 ;
 
 : bubble-up-right
   { number val -- }
-  number @ 0 = if
+  number has-parent invert if
     exit
   then
-  number @ 2 cells + @ number = if
-    number @ val recurse
+  number parent right-child number = if
+    number parent val recurse
   else
-    number @ 2 cells + @ 0 = if
-      val number @ 4 cells + +!
+    number parent has-right-child if
+      number parent right-child val bubble-down-left
     else
-      number @ 2 cells + @ val bubble-down-left
+      val number parent right-value + number parent set-right-value
     then
   then
 ;
 
 : do-explode
   { number }
-  number number 3 cells + @ bubble-up-left
-  number number 4 cells + @ bubble-up-right
+  number number left-value bubble-up-left
+  number number right-value bubble-up-right
 ;
 
 : explode
   { number depth -- f }
-  number cell+ @ 0 = invert if
-    number cell+ @ depth 1 + recurse if
+  number has-left-child if
+    number left-child depth 1 + recurse if
       true
     else
-      number 2 cells + @ 0 = invert if
-        number 2 cells + @ depth 1 + recurse
+      number has-right-child if
+        number right-child depth 1 + recurse
       else
         false
       then
     then
   else
-    number 2 cells + @ 0 = invert if
-      number 2 cells + @ depth 1 + recurse
+    number has-right-child if
+      number right-child depth 1 + recurse
     else
       depth 4 = if
         number do-explode
-        number @ cell+ @ number = if
-          0 number @ cell+ !
-          0 number @ 3 cells + !
+        number parent left-child number = if
+          0 number parent set-left-value
         else
-          0 number @ 2 cells + !
-          0 number @ 4 cells + !
+          0 number parent set-right-value
         then
         number free throw
         true
@@ -160,28 +188,25 @@ defer read-number
 ;
 
 : do-split
-  { number offset -- }
-  5 cells allocate throw
-  dup number 1 offset + cells + !
-  number over !
-  0 over cell+ !
-  0 over 2 cells + !
-  number 3 offset + cells + @ 2/ over 3 cells + !
-  number 3 offset + cells + @ 1+ 2/ over 4 cells + !
-  drop
+  { number val set-child -- }
+  allocate-number
+  dup number set-child execute
+  number over set-parent
+  val 2/ over set-left-value
+  val 1+ 2/ swap set-right-value
 ;
 
 : split
   { number }
-  number cell+ @ 0 = invert if
-    number cell+ @ recurse if
+  number has-left-child if
+    number left-child recurse if
       true
     else
-      number 2 cells + @ 0 = invert if
-        number 2 cells + @ recurse
+      number has-right-child if
+        number right-child recurse
       else
-        number 4 cells + @ 9 > if
-          number 1 do-split
+        number right-value 9 > if
+          number number right-value ['] set-right-child do-split
           true
         else
           false
@@ -189,15 +214,15 @@ defer read-number
       then
     then
   else
-    number 3 cells + @ 9 > if
-      number 0 do-split
+    number left-value 9 > if
+      number number left-value ['] set-left-child do-split
       true
     else
-      number 2 cells + @ 0 = invert if
-        number 2 cells + @ recurse
+      number has-right-child if
+        number right-child recurse
       else
-        number 4 cells + @ 9 > if
-          number 1 do-split
+        number right-value 9 > if
+          number number right-value ['] set-right-child do-split
           true
         else
           false
@@ -226,27 +251,27 @@ defer read-number
 
 : add
   { n1 n2 -- n3 }
-  5 cells allocate throw
-  0 over !
-  dup n1 !
-  dup n2 !
-  n1 over cell+ !
-  n2 over 2 cells + !
+  allocate-number
+  0 over set-parent
+  dup n1 set-parent
+  dup n2 set-parent
+  n1 over set-left-child
+  n2 over set-right-child
   dup reduce
 ;
 
 : magnitude
   { number }
-  number cell+ @ 0 = if
-    number 3 cells + @
+  number has-left-child if
+    number left-child recurse
   else
-    number cell+ @ recurse
+    number left-value
   then
   3 *
-  number 2 cells + @ 0 = if
-    number 4 cells + @
+  number has-right-child if
+    number right-child recurse
   else
-    number 2 cells + @ recurse
+    number right-value
   then
   number free throw
   2 *
@@ -262,26 +287,6 @@ defer read-number
   loop
   arr free throw
   magnitude
-;
-
-: copy-number
-  { number }
-  5 cells allocate throw
-  0 over !
-  number cell+ @ 0 = if
-    0 over cell+ !
-    number 3 cells + @ over 3 cells + !
-  else
-    number cell+ @ recurse over cell+ !
-    dup dup cell+ @ !
-  then
-  number 2 cells + @ 0 = if
-    0 over 2 cells + !
-    number 4 cells + @ over 4 cells + !
-  else
-    number 2 cells + @ recurse over 2 cells + !
-    dup dup 2 cells + @ !
-  then
 ;
 
 : find-largest-magnitude
