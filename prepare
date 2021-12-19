@@ -1,3 +1,9 @@
 #!/bin/sh
 
+if [ "$1" = "19" ]
+then
+    echo "eh, vandaag wilt ge mij niet benchmarken jong"
+    exit 1
+fi
+
 gforthmi --application run day$1/solution.fs

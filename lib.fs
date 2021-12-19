@@ -30,6 +30,10 @@
   { a b c d -- b c d a }
   b c d a ;
 
+: -rot'
+  { a b c d -- d a b c }
+  d a b c ;
+
 : nip''
   { a b c d -- b c d }
   b c d ;
