@@ -70,9 +70,8 @@ needs ../lib.fs
         loop
       loop
     loop
-    swap
-    mem p1 p2 s1 s2 get-p2-addr !
     mem p1 p2 s1 s2 get-p1-addr !
+    mem p1 p2 s1 s2 get-p2-addr !
   then
   mem p1 p2 s1 s2 get-p1-addr @
   mem p1 p2 s1 s2 get-p2-addr @
@@ -81,11 +80,13 @@ needs ../lib.fs
 : simulate-universes
   { p1 p2 }
   10 10 * 21 * 21 * 2 * cells allocate throw
+  dup
   10 10 * 21 * 21 * 2 * 0 do
     -1 over i cells + !
   loop
   p1 0 p2 0 get-wins-at
   max
+  swap free throw
 ;
 
 :noname
