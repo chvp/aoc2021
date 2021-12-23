@@ -130,8 +130,19 @@ defer 'heap-bubble-down
 
 : heap-pop
   { heap }
+  heap heap-size assert( 0 > )
   heap heap-tree @
   heap heap-tree heap heap-size 1 - cells + @ heap heap-tree !
   -1 heap +!
   0 heap heap-bubble-down
+;
+
+: heap-free
+  { elfree heap }
+  heap heap-size 0 > if
+    heap heap-size 0 do
+      i heap heap-getelement elfree execute
+    loop
+  then
+  heap free throw
 ;
