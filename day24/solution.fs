@@ -18,15 +18,12 @@ needs ../treeset.fs
 : state-eq
   { state1 state2 -- f }
   true
-  state1 w state2 w = and
   state1 z state2 z = and
   state1 ip state2 ip = and
 ;
 
 : state-lt
   { state1 state2 -- f }
-  state1 w state2 w < if true exit then
-  state1 w state2 w > if false exit then
   state1 z state2 z < if true exit then
   state1 z state2 z > if false exit then
   state1 ip state2 ip <
@@ -74,22 +71,15 @@ create num-insts
 : instr-inp
   { state dest num }
   state memo-set @ treeset-contains if false exit then
-  state ip 18 / 1 = if
-    dest state copy-state 5 loop-op instr-inp' if
-      5 loop-op .
+  9 0 do
+    state ip 18 / 4 < if
+      state ip 18 / . i loop-op . CR
+    then
+    dest state copy-state i loop-op instr-inp' if
+      i loop-op .
       true unloop exit
     then
-  else
-    9 0 do
-      state ip 18 / 4 < if
-        state ip 18 / . i loop-op . CR
-      then
-      dest state copy-state i loop-op instr-inp' if
-        i loop-op .
-        true unloop exit
-      then
-    loop
-  then
+  loop
   state copy-state memo-set @ treeset-add
   false
 ;
@@ -184,4 +174,4 @@ create num-insts
   read-instructions num-insts ! insts !
   find-extreme
   bye
-; execute
+; is 'cold
